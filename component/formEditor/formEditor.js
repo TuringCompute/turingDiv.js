@@ -1,19 +1,18 @@
-import {DivEle} from "../../lib/divEle.js"
-import {OrderedDict} from "../../lib/orderedDict.js"
-import {DataType} from "../../lib/dataType.js"
-import {Style} from "../../lib/style.js"
 import {DataStore} from "../../lib/dataStore.js"
+import {DataType} from "../../lib/dataType.js"
+import {DivEle} from "../../lib/divEle.js"
+import {Event} from "../../lib/event.js"
+import {OrderedDict} from "../../lib/orderedDict.js"
+import {Style} from "../../lib/style.js"
+
 
 class FormEditor extends DivEle{
     static inputChanged = "formEditorInputChanged"
 
-    constructor(props, parent=null){
-        super(props, parent)
+    constructor(props){
+        super(props)
         if(!props.schema){
             throw Error("missing schema in props to build")
-        }
-        if(!props.dataStore || !(props.dataStore instanceof DataStore)){
-            throw Error("please provide DataStore from dataStore.js as storage backend")
         }
         this.dataStore = props.dataStore
         this.dataBag = this.dataStore.newData(this.id, DataStore.subscriber(this.id, this.handleEvent))
@@ -38,20 +37,13 @@ class FormEditor extends DivEle{
                 if(attrDef.type == DataType.bool){
                     inputType = "checkbox"
                 }
-                let inputId = this.id + "-" + attr
-                let changeEvent = {
-                    "src": inputId,
-                    "type": FormEditor.inputChanged,
-                    "data": {
-                        "attr": attr
-                    }
-                }
+                let changeEvent = Event.new(FormEditor.inputChanged, attr, {})
                 let attrVal = null
                 if(this.data && this.data[attr]){
                     attrVal = this.data[attr]
                 }
                 let inputVal = DataType.htmlValue(attrDef.type, attrVal)
-                let inputStr = "<input id='" + inputId + "' type='" + inputType + "' " + inputVal + 
+                let inputStr = "<input name='" + attr + "' type='" + inputType + "' " + inputVal + 
                                     " onChange='" + this.eventTriger(changeEvent) + "' />"
                 htmlList.push("<tr><td>" + attr + "</td><td>" + inputStr + "</td></tr>")
             }
@@ -60,33 +52,41 @@ class FormEditor extends DivEle{
                 htmlList.splice(0, 0 , "<table>")
                 htmlList.push("</table>")
             }
+            Style.applyIndent(htmlList)
+            this.addDivEleFrame(htmlList)
         }else{
             throw Error("no code for display according to template yet")
         }
         return htmlList
     }
 
-    processEvent(event){
-        if(event.type == FormEditor.inputChanged){
-            let attr = event.data.attr
+    processEvent(src, event, eventObj){
+        if(eventObj.type == FormEditor.inputChanged){
+            let attr = eventObj.src
+            if (!this.schema.data.hasOwnProperty(attr)){
+                return false
+            }
             let attrDef = this.schema.data[attr]
             if (!attrDef){
                 console.log("invalid event. attr=" + attr + " does not exists in schema")
             }
-            let attrEle = document.getElementById(event.src)
-            let attrValue = attrEle.value
-            if(attrEle.type == "checkbox"){
-                attrValue = attrEle.checked
+            let attrValue = src.value
+            if(eventObj.data.hasOwnProperty("attrValue")){
+                attrValue = eventObj.data.attrValue
             } else {
-                attrValue = DataType.htmlToValue(attrDef.type, attrValue)
-            }
+                if(src.type == "checkbox"){
+                    attrValue = src.checked
+                } else {
+                    attrValue = DataType.htmlToValue(attrDef.type, attrValue)
+                }
+            }            
             if(!this.data[attr] || this.data[attr] != attrValue){
                 this.data[attr] = attrValue
                 if(this.dataBag.dataId){
                     this.dataStore.notify(this.dataBag.dataId)
                 }
             }
-        } else if(event.type == DataStore.dataChanged && event.src == this.id){
+        } else if(eventObj.type == DataStore.dataChanged && eventObj.src == this.id){
             this.bindData()
             this.render()
             return true

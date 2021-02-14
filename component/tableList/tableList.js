@@ -1,22 +1,16 @@
-import { DataType } from "../../lib/dataType.js"
 import { DataStore } from "../../lib/dataStore.js"
 import {DivEle} from "../../lib/divEle.js"
 import { Style } from "../../lib/style.js"
+import {Event} from "../../lib/event.js"
 
 class TableList extends DivEle {
     static selectionChanged = "tableListSelectionChanged"
 
-    constructor(props, parent=null){
-        super(props, parent)
+    constructor(props){
+        super(props)
         this.fieldSchema = props.fieldSchema
-        if(!this.fieldSchema){
-            throw Error("missing display field schema")
-        }
         this.displayOrder = props.displayOrder
-        if(!this.displayOrder || this.displayOrder.length == 0){
-            throw Error("displayOrder is missing or is empty")
-        }
-        this.validateDisplay()
+        this.validateSchema()
         this.dataStore = props.dataStore
         if(!this.props.dataStore || !(this.props.dataStore instanceof DataStore)){
             throw Error("please provide DataStore from dataStore.js as storage backend")
@@ -31,7 +25,13 @@ class TableList extends DivEle {
         }
     }
 
-    validateDisplay(){
+    validateSchema(){
+        if(!this.fieldSchema){
+            throw Error("missing display field schema")
+        }
+        if(!this.displayOrder || this.displayOrder.length == 0){
+            throw Error("displayOrder is missing or is empty")
+        }
         for(let attr of this.displayOrder){
             if(!this.fieldSchema[attr[0]] || !this.fieldSchema[attr[0]].type){
                 throw Error("missing schema or data type for attr=" + attr[0])
@@ -61,8 +61,9 @@ class TableList extends DivEle {
     }
 
     selectData(idx){
-        if((!this.selectedIdx || this.selectedIdx != idx) && this.dataBag.data[idx]){
+        if((!this.selection.idx || this.selection.idx != idx) && this.dataBag.data[idx]){
             this.selection.dataId = this.dataId
+            this.selection.idx = idx
             this.selection.data = this.dataBag.data[idx]
             this.dataStore.notify(this.selectDataId)
             return true
@@ -88,25 +89,30 @@ class TableList extends DivEle {
                     }
                     lineStr += "<td>" + td_val + "</td>"
                 }
-                let selectEvent = {
-                    "src": idx,
-                    "type": TableList.selectionChanged
+                if(idx != this.selection.idx){
+                    let selectEvent = Event.new(TableList.selectionChanged, idx, {})
+                    lineStr = "<tr onclick='" + this.eventTriger(selectEvent) + "'>" + lineStr + "</tr>"
+                } else {
+                    lineStr = "<tr style='background-color: #ddd;'>" + lineStr + "</tr>"
                 }
-                lineStr = "<tr onclick='" + this.eventTriger(selectEvent) + "'>" + lineStr + "</tr>"
+
+                
                 htmlList.push(lineStr)
             }
         }
         Style.applyIndent(htmlList)
         htmlList.splice(0, 0, "<table border=1>")
         htmlList.push("</table>")
+        Style.applyIndent(htmlList)
+        this.addDivEleFrame(htmlList)
         return htmlList
     }
 
-    processEvent(event){
-        if(event.type == TableList.selectionChanged){
-            return this.selectData(event.src)            
+    processEvent(src, event, eventObj){
+        if(eventObj.type == TableList.selectionChanged){
+            return this.selectData(eventObj.src)            
         }
-        if(event.type == DataStore.dataChanged){
+        if(eveventObjent.type == DataStore.dataChanged){
             return true
         }
         return false
