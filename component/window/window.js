@@ -41,7 +41,7 @@ class WinEle extends DivEle{
         let winHeight = (this.props.height - 20)
         if(winHeight > 0){
             htmlList.push("<div class='crop' style='left:0px;top:" + this.props.titleHeight + "px;height=" + winHeight + "px;width:" + this.props.width + "px;'>")
-            for(let childId in this.children.attrOrder){
+            for(let childId of this.children.attrOrder){
                 let cNode = this.children.data[childId].node
                 childHtml = cNode.outputHTML()
                 htmlList.push(...childHtml)
