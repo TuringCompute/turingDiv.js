@@ -66,8 +66,12 @@ class WinEle extends DivEle{
 
     addDivEleFrame(htmlList){
         Style.applyIndent(htmlList)
+        let zIdx = ""
+        if (this.props.hasOwnProperty("zIdx")){
+            zIdx = "z-index:" + this.props.zIdx + ";"
+        }
         htmlList.splice(0,0, "<div id='" + this.id + "' style='position:absolute;left:" + this.props.left + "px;top:" + this.props.top + "px;" + 
-                            "width:" + this.props.width + "px;height:" + this.props.height + "px;'>")
+                            "width:" + this.props.width + "px;height:" + this.props.height + "px;" + zIdx + "'>")
         htmlList.push("</div>")
     }
 
