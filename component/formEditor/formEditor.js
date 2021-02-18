@@ -3,7 +3,7 @@ import {DataType} from "../../lib/dataType.js"
 import {DivEle} from "../../lib/divEle.js"
 import {Event} from "../../lib/event.js"
 import {OrderedDict} from "../../lib/orderedDict.js"
-import {Style} from "../../lib/style.js"
+import {Format} from "../../lib/format.js"
 
 
 class FormEditor extends DivEle{
@@ -48,11 +48,11 @@ class FormEditor extends DivEle{
                 htmlList.push("<tr><td>" + attr + "</td><td>" + inputStr + "</td></tr>")
             }
             if(htmlList.length > 0){
-                Style.applyIndent(htmlList)
+                Format.applyIndent(htmlList)
                 htmlList.splice(0, 0 , "<table>")
                 htmlList.push("</table>")
             }
-            Style.applyIndent(htmlList)
+            Format.applyIndent(htmlList)
             this.addDivEleFrame(htmlList)
         }else{
             throw Error("no code for display according to template yet")

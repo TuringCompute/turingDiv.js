@@ -1,6 +1,6 @@
-import { DataStore } from "../../lib/dataStore.js"
+import {DataStore} from "../../lib/dataStore.js"
 import {DivEle} from "../../lib/divEle.js"
-import { Style } from "../../lib/style.js"
+import {Format} from "../../lib/format.js"
 import {Event} from "../../lib/event.js"
 
 class TableList extends DivEle {
@@ -100,10 +100,10 @@ class TableList extends DivEle {
                 htmlList.push(lineStr)
             }
         }
-        Style.applyIndent(htmlList)
+        Format.applyIndent(htmlList)
         htmlList.splice(0, 0, "<table border=1>")
         htmlList.push("</table>")
-        Style.applyIndent(htmlList)
+        Format.applyIndent(htmlList)
         this.addDivEleFrame(htmlList)
         return htmlList
     }

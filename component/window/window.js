@@ -1,5 +1,5 @@
 import {DivEle} from "../../lib/divEle.js"
-import {Style} from "../../lib/style.js"
+import {Format} from "../../lib/format.js"
 import {OrderedDict} from "../../lib/orderedDict.js"
 import {StyleSheet} from "../../lib/styleSheet.js"
 import {Event} from "../../lib/event.js"
@@ -48,7 +48,7 @@ class WinEle extends DivEle{
             }
             htmlList.push("</div>")
         }
-        Style.applyIndent(htmlList)
+        Format.applyIndent(htmlList)
         this.addDivEleFrame(htmlList)
         return htmlList
     }
@@ -65,7 +65,7 @@ class WinEle extends DivEle{
     }
 
     addDivEleFrame(htmlList){
-        Style.applyIndent(htmlList)
+        Format.applyIndent(htmlList)
         let zIdx = ""
         if (this.props.hasOwnProperty("zIdx")){
             zIdx = "z-index:" + this.props.zIdx + ";"
