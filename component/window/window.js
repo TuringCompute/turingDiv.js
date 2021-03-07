@@ -76,6 +76,7 @@ class WinEle extends DivEle{
     }
 
     processEvent(src, event, eventObj){
+        let mouse = MouseState.GetMouse()
         if(eventObj.type == MouseState.mouseDown){
             this.mouseData = {
                 "action": eventObj.data.action,
@@ -86,12 +87,12 @@ class WinEle extends DivEle{
                 "x": event.x,
                 "y": event.y
             }
-            window.mouse.registerTarget(this)
+            mouse.registerTarget(this)
         } else if(eventObj.type == MouseState.mouseUp){
             if(this.mouseData){
                 delete this.mouseData
             }
-            window.mouse.deregister()
+            mouse.deregister()
         } else if(eventObj.type == MouseState.mouseMoved){
             if(this.mouseData){
                 if(this.mouseData.action[0] == WinEle.Action.move){
