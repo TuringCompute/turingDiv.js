@@ -64,13 +64,27 @@ class PopMenu extends DivEle{
         }
         htmlList.push("</div>")
     }
-    
+
+    clickIn(event){
+        let div = document.getElementById(this.id)
+        if(event.clientX < div.offsetLeft || event.clientX > (div.offsetLeft + div.offsetWidth)){
+            return false
+        }
+        if(event.clientY < div.offsetTop || event.clientY > (div.offsetTop + div.offsetHeight)){
+            return false
+        }
+        return true
+    }
+
     processEvent(src, event, eventObj){
         let mouse = MouseState.GetMouse()
         if(eventObj.type == PopMenu.Events.show){
             mouse.registerTarget(this)
             return true
         } else if(eventObj.type == MouseState.mouseUp){
+            if (this.clickIn(event)){
+                return false
+            }
             this.hideMenu()
             mouse.deregister()
             return true
