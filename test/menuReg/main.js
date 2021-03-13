@@ -1,4 +1,4 @@
-import {PopMenu} from "../../component/popMenu/popMenu.js"
+import {MenuReg} from "../../component/menuReg/menuReg.js"
 import {DivEle} from "../../lib/divEle.js"
 
 class TestMenu extends DivEle{
@@ -22,11 +22,14 @@ class TestMenu extends DivEle{
 }
 
 window.main = function main(){
-    let popMenu = new PopMenu({
+    let regMenu = new MenuReg({
         "divId": "windowRoot"
     })
     new TestMenu({
-        "parentId": popMenu.id,
+        "parentId": regMenu.id,
         "childId": "test"
+    })
+    let nextMenu = new MenuReg({
+        "divId": "windowRoot"
     })
 }

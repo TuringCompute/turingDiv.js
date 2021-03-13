@@ -3,21 +3,21 @@ import {MouseState} from "../../lib/mouse.js"
 import {Event} from "../../lib/event.js"
 import {Format} from "../../lib/format.js"
 
-class PopMenu extends DivEle{
+class MenuReg extends DivEle{
     static Events = {
-        "show": "popMenuShow",
-        "hide": "popMenuHide"
+        "show": "MenuRegShow",
+        "hide": "MenuRegHide"
     }
     constructor(props){
-        if (!PopMenu.instance){
+        if (!MenuReg.instance){
             super(props)
-            PopMenu.instance = this
+            MenuReg.instance = this
             this.showMenuId = null
             this.posStyle = ""
             this.showMenuTopLeft = this.showMenuTopLeft.bind(this)
             window.showMenuTopLeft = this.showMenuTopLeft
         }
-        return PopMenu.instance
+        return MenuReg.instance
     }
 
     showMenuTopLeft(top, left, menuId){
@@ -29,7 +29,7 @@ class PopMenu extends DivEle{
             this.showMenuId = menuId
             this.posStyle = posStyle
         }
-        this.handleEvent(null, null, Event.new(PopMenu.Events.show, null, null))
+        this.handleEvent(null, null, Event.new(MenuReg.Events.show, null, null))
     }
 
     hideMenu(){
@@ -53,14 +53,10 @@ class PopMenu extends DivEle{
 
     addDivEleFrame(htmlList){
         Format.applyIndent(htmlList)
-        let posStyle = this.posStyle
         if(this.props.hasOwnProperty("zIdx")){
-            htmlList.splice(0,0, "<div id='" + this.id + " style='z-index:" + this.props.zIdx + ";" + posStyle + "'>")
+            htmlList.splice(0,0, "<div id='" + this.id + " style='z-index:" + this.props.zIdx + ";position: absolute;" + this.posStyle + "'>")
         } else {
-            if(posStyle !== ""){
-                posStyle = "style='" + posStyle + "'"
-            }
-            htmlList.splice(0,0, "<div id='" + this.id + "' " + posStyle + ">")
+            htmlList.splice(0,0, "<div id='" + this.id + "' style='position: absolute;" + this.posStyle + "'>")
         }
         htmlList.push("</div>")
     }
@@ -77,8 +73,8 @@ class PopMenu extends DivEle{
     }
 
     processEvent(src, event, eventObj){
-        let mouse = MouseState.GetMouse()
-        if(eventObj.type == PopMenu.Events.show){
+        let mouse = new MouseState()
+        if(eventObj.type == MenuReg.Events.show){
             mouse.registerTarget(this)
             return true
         } else if(eventObj.type == MouseState.mouseUp){
@@ -93,4 +89,4 @@ class PopMenu extends DivEle{
     }
 }
 
-export {PopMenu}
+export {MenuReg}

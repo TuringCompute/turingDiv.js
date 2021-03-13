@@ -76,7 +76,7 @@ class WinEle extends DivEle{
     }
 
     processEvent(src, event, eventObj){
-        let mouse = MouseState.GetMouse()
+        let mouse = new MouseState()
         if(eventObj.type == MouseState.mouseDown){
             this.mouseData = {
                 "action": eventObj.data.action,
