@@ -20,6 +20,13 @@ class MenuReg extends DivEle{
         return MenuReg.instance
     }
 
+    static GetMenu(){
+        if(!MenuReg.instance){
+            throw Error("please instantiate MenuReg with a div-id")
+        }
+        return MenuReg.instance
+    }
+
     showMenuTopLeft(top, left, menuId){
         if(!menuId || !this.children.getValue(menuId)){
             throw Error("invalid menuId [" + menuId + "]")
