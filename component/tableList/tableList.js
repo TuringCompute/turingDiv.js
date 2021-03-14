@@ -11,15 +11,11 @@ class TableList extends DivEle {
         this.fieldSchema = props.fieldSchema
         this.displayOrder = props.displayOrder
         this.validateSchema()
-        this.dataStore = props.dataStore
-        if(!this.props.dataStore || !(this.props.dataStore instanceof DataStore)){
-            throw Error("please provide DataStore from dataStore.js as storage backend")
-        }
         this.selectDataId = props.selectDataId
         if(!this.selectDataId){
             throw Error("missing data allocation to store list selection result")
         }
-        this.selection = this.dataStore.getData(this.selectDataId)
+        this.selection = DataStore.GetStore().getData(this.selectDataId)
         if(!this.selection){
             throw Error("invalid selectDataId=" +selectDataId + " from DataStore")
         }
@@ -41,8 +37,9 @@ class TableList extends DivEle {
 
     bindData(dataId){
         if(!this.dataId || this.dataId!=dataId){
+            let store = DataStore.GetStore()
             if(this.dataId){
-                this.dataStore.unsubscribe(this.dataId, this.id)
+                store.unsubscribe(this.dataId, this.id)
             }            
             this.dataId = dataId
             if(this.selection.dataId){
@@ -50,9 +47,9 @@ class TableList extends DivEle {
             }
             if(this.selection.data){
                 delete this.selection.data
-                this.dataStore.notify(this.selectDataId)
+                store.notify(this.selectDataId)
             }            
-            this.dataBag = this.dataStore.getData(this.dataId, DataStore.subscriber(this.id, this.handleEvent))
+            this.dataBag = store.getData(this.dataId, DataStore.subscriber(this.id, this.handleEvent))
             if(!this.dataBag){
                 throw Error("invalid data=" + this.dataId + " from DataStore")
             }
@@ -65,7 +62,7 @@ class TableList extends DivEle {
             this.selection.dataId = this.dataId
             this.selection.idx = idx
             this.selection.data = this.dataBag.data[idx]
-            this.dataStore.notify(this.selectDataId)
+            DataStore.GetStore().notify(this.selectDataId)
             return true
         }
         return false
@@ -112,7 +109,7 @@ class TableList extends DivEle {
         if(eventObj.type == TableList.selectionChanged){
             return this.selectData(eventObj.src)            
         }
-        if(eveventObjent.type == DataStore.dataChanged){
+        if(eventObj.type == DataStore.dataChanged){
             return true
         }
         return false

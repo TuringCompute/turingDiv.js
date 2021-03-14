@@ -5,12 +5,10 @@ import {DivEle} from "../../lib/divEle.js"
 class TabSwitchTest extends DivEle{
     constructor(props){
         super(props)
-        this.store = new DataStore()
         let tabSwitch = new TabSwitch({
-            "divId": "tabDiv",
-            "dataStore": this.store
+            "divId": "tabDiv"
         })
-        this.selectionData = this.store.getData(tabSwitch.id, DataStore.subscriber(this.id, this.handleEvent))
+        this.selectionData = DataStore.GetStore().getData(tabSwitch.id, DataStore.subscriber(this.id, this.handleEvent))
         tabSwitch.bindData(["optA", "optB", "optC"])
         tabSwitch.render()
     }

@@ -9,11 +9,7 @@ class TabSwitch extends DivEle{
 
     constructor(props){
         super(props)
-        this.dataStore = props.dataStore
-        if(!this.dataStore || !(this.dataStore instanceof DataStore)){
-            throw Error("Component Model Editor needs dataStore in props")
-        }
-        this.dataBag = this.dataStore.newData(this.id, DataStore.subscriber(this.id, this.handleEvent))
+        this.dataBag = DataStore.GetStore().newData(this.id, DataStore.subscriber(this.id, this.handleEvent))
         this.tabCache = {}
     }
 
@@ -23,13 +19,13 @@ class TabSwitch extends DivEle{
         }
         this.dataBag.tabData = tabOpts
         this.dataBag.selectedIdx = 0
-        this.dataStore.notify(this.id)
+        DataStore.GetStore().notify(this.id)
     }
 
     selectIdx(idx){
         if(idx != this.dataBag.selectIdx){
             this.dataBag.selectedIdx = idx
-            this.dataStore.notify(this.id)
+            DataStore.GetStore().notify(this.id)
         }
     }
 

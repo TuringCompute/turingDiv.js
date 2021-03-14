@@ -14,8 +14,7 @@ class FormEditor extends DivEle{
         if(!props.schema){
             throw Error("missing schema in props to build")
         }
-        this.dataStore = props.dataStore
-        this.dataBag = this.dataStore.newData(this.id, DataStore.subscriber(this.id, this.handleEvent))
+        this.dataBag = DataStore.GetStore().newData(this.id, DataStore.subscriber(this.id, this.handleEvent))
         this.dataBag["data"] = {}
         this.bindData()
         this.schema = new OrderedDict(this.props.schema)
@@ -83,7 +82,7 @@ class FormEditor extends DivEle{
             if(!this.data[attr] || this.data[attr] != attrValue){
                 this.data[attr] = attrValue
                 if(this.dataBag.dataId){
-                    this.dataStore.notify(this.dataBag.dataId)
+                    DataStore.GetStore().notify(this.dataBag.dataId)
                 }
             }
         } else if(eventObj.type == DataStore.dataChanged && eventObj.src == this.id){
