@@ -1,7 +1,7 @@
 import {DataStore} from "../../lib/dataStore.js"
 import {DivEle} from "../../lib/divEle.js"
 import {Format} from "../../lib/format.js"
-import {Event} from "../../lib/event.js"
+import {EventSrc} from "../../lib/event.js"
 
 class TableList extends DivEle {
     static selectionChanged = "tableListSelectionChanged"
@@ -76,8 +76,8 @@ class TableList extends DivEle {
         }
         htmlList.push(headerStr)
         if (this.dataBag && this.dataBag.data){
-            let lineStr = ""
             for(let idx in this.dataBag.data){
+                let lineStr = ""
                 for(let cI in this.displayOrder){
                     let attr = this.displayOrder[cI][0]
                     let td_val = this.dataBag.data[idx][attr]
@@ -87,13 +87,11 @@ class TableList extends DivEle {
                     lineStr += "<td>" + td_val + "</td>"
                 }
                 if(idx != this.selection.idx){
-                    let selectEvent = Event.new(TableList.selectionChanged, idx, {})
-                    lineStr = "<tr onclick='" + this.eventTriger(selectEvent) + "'>" + lineStr + "</tr>"
+                    let selectEvent = EventSrc.new(TableList.selectionChanged, idx, {})
+                    lineStr = "<tr onclick='" + this.eventTriger(selectEvent) + "' style='cursor: pointer;'>" + lineStr + "</tr>"
                 } else {
                     lineStr = "<tr style='background-color: #ddd;'>" + lineStr + "</tr>"
                 }
-
-                
                 htmlList.push(lineStr)
             }
         }
@@ -105,7 +103,7 @@ class TableList extends DivEle {
         return htmlList
     }
 
-    processEvent(src, event, eventObj){
+    processEvent(eventObj){
         if(eventObj.type == TableList.selectionChanged){
             return this.selectData(eventObj.src)            
         }

@@ -1,7 +1,7 @@
 import {DataStore} from "../../lib/dataStore.js"
 import {DivEle} from "../../lib/divEle.js"
 import {Format} from "../../lib/format.js"
-import {Event} from "../../lib/event.js"
+import {EventSrc} from "../../lib/event.js"
 
 
 class TabSwitch extends DivEle{
@@ -47,7 +47,7 @@ class TabSwitch extends DivEle{
         return false
     }
 
-    processEvent(src, event, eventObj){
+    processEvent(eventObj){
         if(eventObj.type == TabSwitch.selectionChanged){
             this.selectIdx(eventObj.src)
             return false
@@ -56,12 +56,16 @@ class TabSwitch extends DivEle{
         }
     }
 
-    selectedTab(idx){
+    selectedTabValue(){
+        return this.dataBag.tabData[this.dataBag.selectedIdx]
+    }
+
+    selectedTabHtml(idx){
         return "<td style='border-left: 1px solid rgba(204,31,48,1);border-top: 2px solid rgba(204,31,48,1);border-right: 2px solid rgba(204,31,48,1);cursor:default;'>" + this.dataBag.tabData[idx] + "</td>"
     }
 
-    optTab(idx){
-        let selectEvent = Event.new(TabSwitch.selectionChanged, idx, {})
+    optTabHtml(idx){
+        let selectEvent = EventSrc.new(TabSwitch.selectionChanged, idx, {})
         return "<td style='border-top: 1px solid rgba(204,31,48,1);border-right: 1px solid rgba(204,31,48,1);cursor:hand;' onclick='" + this.eventTriger(selectEvent) +"'>" + this.dataBag.tabData[idx] + "</td>"
     }
 
@@ -69,9 +73,9 @@ class TabSwitch extends DivEle{
         let tabList = []
         for(let idx=0; idx<this.dataBag.tabData.length; idx++){
             if(idx == this.dataBag.selectedIdx){
-                tabList.push(this.selectedTab(idx))
+                tabList.push(this.selectedTabHtml(idx))
             } else {
-                tabList.push(this.optTab(idx))
+                tabList.push(this.optTabHtml(idx))
             }
         }
         return tabList

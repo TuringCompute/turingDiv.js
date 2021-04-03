@@ -6,7 +6,8 @@ window.main = function main(){
     let dataId = "testData"
     window.dataBag = DataStore.GetStore().newData(dataId, DataStore.subscriber(dataId, dataChanged))
     window.dataBag.data = [
-        {"attrName": "quantity", "type": "integer", "required": false}
+        {"attrName": "quantity", "type": "integer", "required": false},
+        {"attrName": "testName", "type": "String", "required": true}
     ]
     let selectDataId = "testSel01"
     window.selection = DataStore.GetStore().newData(selectDataId, DataStore.subscriber(selectDataId, selectionChanged))

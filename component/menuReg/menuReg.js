@@ -1,6 +1,6 @@
 import {DivEle} from "../../lib/divEle.js"
 import {MouseState} from "../../lib/mouse.js"
-import {Event} from "../../lib/event.js"
+import {EventSrc} from "../../lib/event.js"
 import {Format} from "../../lib/format.js"
 
 class MenuReg extends DivEle{
@@ -36,7 +36,7 @@ class MenuReg extends DivEle{
             this.showMenuId = menuId
             this.posStyle = posStyle
         }
-        this.handleEvent(null, null, Event.new(MenuReg.Events.show, null, null))
+        this.handleEvent(EventSrc.new(MenuReg.Events.show, null, null))
     }
 
     hideMenu(){
@@ -69,6 +69,9 @@ class MenuReg extends DivEle{
     }
 
     clickIn(event){
+        if(!event){
+            return false
+        }
         let div = document.getElementById(this.id)
         if(event.clientX < div.offsetLeft || event.clientX > (div.offsetLeft + div.offsetWidth)){
             return false
@@ -79,12 +82,13 @@ class MenuReg extends DivEle{
         return true
     }
 
-    processEvent(src, event, eventObj){
+    processEvent(eventObj){
         let mouse = new MouseState()
         if(eventObj.type == MenuReg.Events.show){
             mouse.registerTarget(this)
             return true
         } else if(eventObj.type == MouseState.mouseUp){
+            let event = eventObj[EventSrc.Key.rawEvent]
             if (this.clickIn(event)){
                 return false
             }

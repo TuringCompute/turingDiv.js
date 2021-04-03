@@ -1,7 +1,7 @@
 import {DataStore} from "../../lib/dataStore.js"
 import {DataType} from "../../lib/dataType.js"
 import {DivEle} from "../../lib/divEle.js"
-import {Event} from "../../lib/event.js"
+import {EventSrc} from "../../lib/event.js"
 import {OrderedDict} from "../../lib/orderedDict.js"
 import {Format} from "../../lib/format.js"
 
@@ -36,7 +36,8 @@ class FormEditor extends DivEle{
                 if(attrDef.type == DataType.bool){
                     inputType = "checkbox"
                 }
-                let changeEvent = Event.new(FormEditor.inputChanged, attr, {})
+                let changeEvent = EventSrc.new(FormEditor.inputChanged, attr, {})
+                changeEvent[EventSrc.srcEle]
                 let attrVal = null
                 if(this.data && this.data[attr]){
                     attrVal = this.data[attr]
@@ -59,7 +60,7 @@ class FormEditor extends DivEle{
         return htmlList
     }
 
-    processEvent(src, event, eventObj){
+    processEvent(eventObj){
         if(eventObj.type == FormEditor.inputChanged){
             let attr = eventObj.src
             if (!this.schema.data.hasOwnProperty(attr)){
@@ -69,12 +70,17 @@ class FormEditor extends DivEle{
             if (!attrDef){
                 console.log("invalid event. attr=" + attr + " does not exists in schema")
             }
-            let attrValue = src.value
+            let htmlEle = eventObj[EventSrc.Key.srcEle];
+            if(!htmlEle){
+                console.log("irregular, do nothing, input change without field [" + EventSrc.Key.srcEle + "]")
+                return false
+            }
+            let attrValue = htmlEle.value
             if(eventObj.data.hasOwnProperty("attrValue")){
                 attrValue = eventObj.data.attrValue
             } else {
-                if(src.type == "checkbox"){
-                    attrValue = src.checked
+                if(htmlEle.type == "checkbox"){
+                    attrValue = htmlEle.checked
                 } else {
                     attrValue = DataType.htmlToValue(attrDef.type, attrValue)
                 }

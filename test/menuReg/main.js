@@ -10,10 +10,10 @@ class TestMenu extends DivEle{
         let htmlList = [
             "<table border=1>",
             "  <tr>",
-            "    <td onClick='alert(1)'>line 1</td>",
+            "    <td onClick='alert(1)' style='cursor: pointer;'>line 1</td>",
             "  </tr>",
             "  <tr>",
-            "    <td onClick='alert(2)'>line 2</td>",
+            "    <td onClick='alert(2)' style='cursor: pointer;'>line 2</td>",
             "  </tr>",
             "</table>"
         ]

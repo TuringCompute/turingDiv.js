@@ -2,9 +2,13 @@ import {DataStore} from "../../lib/dataStore.js"
 import {FormEditor} from "../../component/formEditor/formEditor.js"
 import {TableList} from "../../component/tableList/tableList.js"
 
+function dataChanged(eventObj){
+    console.log("data changed")
+}
+
 window.main = function main(){
     window.store = new DataStore()
-    window.attrList = store.newData("tableList", DataStore.subscriber("main", dataChange))
+    window.attrList = store.newData("tableList", DataStore.subscriber("main", dataChanged))
     window.attrList.data = [
         {
             "attrName": "quantity",
@@ -29,23 +33,17 @@ window.main = function main(){
     }
     let attrEditor = new FormEditor({
         "divId": "attributeEditor",
-        "dataStore": window.store, 
         "schema": fieldSchema
     })
     attrEditor.render()
     let tList = new TableList({
         "divId": "attributeList",
-        "dataStore": window.store, 
         "fieldSchema": fieldSchema,
         "displayOrder": [["attrName", "Attribute"], ["type", "Data Type"], ["required", "Required"]],
         "selectDataId": attrEditor.id
     })
     window.attrList = tList
     tList.render()
-}
-
-function dataChange(event){
-    console.log("list data changes")
 }
 
 window.setData = function setData(){

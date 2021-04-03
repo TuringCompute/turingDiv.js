@@ -2,7 +2,7 @@ import {DivEle} from "../../lib/divEle.js"
 import {Format} from "../../lib/format.js"
 import {OrderedDict} from "../../lib/orderedDict.js"
 import {StyleSheet} from "../../lib/styleSheet.js"
-import {Event} from "../../lib/event.js"
+import {EventSrc} from "../../lib/event.js"
 import {MouseState} from "../../lib/mouse.js"
 
 class WinEle extends DivEle{
@@ -27,7 +27,7 @@ class WinEle extends DivEle{
     }
 
     mouseEvent(action){
-        let mseEventStr = " onMouseDown='" + this.eventTriger(Event.new(MouseState.mouseDown, null, {"action": action})) + "' "
+        let mseEventStr = " onMouseDown='" + this.eventTriger(EventSrc.new(MouseState.mouseDown, null, {"action": action})) + "' "
         return mseEventStr
     }
 
@@ -75,7 +75,7 @@ class WinEle extends DivEle{
         htmlList.push("</div>")
     }
 
-    processEvent(src, event, eventObj){
+    processEvent(eventObj){
         let mouse = new MouseState()
         if(eventObj.type == MouseState.mouseDown){
             this.mouseData = {
