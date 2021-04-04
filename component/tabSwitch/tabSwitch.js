@@ -19,7 +19,6 @@ class TabSwitch extends DivEle{
         }
         this.dataBag.tabData = tabOpts
         this.dataBag.selectedIdx = 0
-        DataStore.GetStore().notify(this.id)
     }
 
     selectIdx(idx){
