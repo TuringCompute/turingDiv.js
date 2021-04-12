@@ -4,10 +4,19 @@ import {DivEle} from "../../lib/divEle.js"
 import {EventSrc} from "../../lib/event.js"
 import {OrderedDict} from "../../lib/orderedDict.js"
 import {Format} from "../../lib/format.js"
+import { EditList } from "../tableList/tableList.js"
 
 
 class FormEditor extends DivEle{
-    static inputChanged = "formEditorInputChanged"
+    static Event = Object.freeze({
+        "inputChanged": "formEditorInputChanged",
+        "saveData": "formEditorSaveData"
+    })
+
+    static Key = Object.freeze({
+        "dataId": "editingDataId",
+        "data": "editingData"
+    })
 
     constructor(props){
         super(props)
@@ -15,20 +24,20 @@ class FormEditor extends DivEle{
             throw Error("missing schema in props to build")
         }
         this.dataBag = DataStore.GetStore().newData(this.id, DataStore.subscriber(this.id, this.handleEvent))
-        this.dataBag["data"] = {}
-        this.bindData()
         this.schema = new OrderedDict(this.props.schema)
         this.template = this.props.template
     }
 
-    bindData(){
-        this.data = this.dataBag.data
+    static bindData(dataBag, dataId, data){
+        dataBag[FormEditor.Key.dataId] = dataId
+        dataBag[FormEditor.Key.data] = data
     }
 
     outputHTML(){
-        let htmlList = []
+        let htmlList = ["<table>"]
         if(!this.tempalte){
             // no display template, so use the default attribute edit table
+            let data = this.dataBag[FormEditor.Key.data]
             for(let idx in this.schema.attrOrder){
                 let attr = this.schema.attrOrder[idx]
                 let attrDef = this.schema.data[attr]
@@ -36,22 +45,24 @@ class FormEditor extends DivEle{
                 if(attrDef.type == DataType.bool){
                     inputType = "checkbox"
                 }
-                let changeEvent = EventSrc.new(FormEditor.inputChanged, attr, {})
+                let changeEvent = EventSrc.new(FormEditor.Event.inputChanged, attr, {})
                 changeEvent[EventSrc.srcEle]
                 let attrVal = null
-                if(this.data && this.data[attr]){
-                    attrVal = this.data[attr]
+                if(data && data[attr]){
+                    attrVal = data[attr]
                 }
                 let inputVal = DataType.htmlValue(attrDef.type, attrVal)
                 let inputStr = "<input name='" + attr + "' type='" + inputType + "' " + inputVal + 
                                     " onChange='" + this.eventTriger(changeEvent) + "' />"
-                htmlList.push("<tr><td>" + attr + "</td><td>" + inputStr + "</td></tr>")
+                htmlList.push("  <tr><td>" + attr + "</td><td>" + inputStr + "</td></tr>")
             }
-            if(htmlList.length > 0){
-                Format.applyIndent(htmlList)
-                htmlList.splice(0, 0 , "<table>")
-                htmlList.push("</table>")
+            let saveDisabled = "disabled"
+            if(this.dataBag[FormEditor.Key.dataId]){
+                saveDisabled = ""
             }
+            let saveEvent = EventSrc.new(FormEditor.Event.saveData, null, {})
+            htmlList.push("<tr><td align=center><button type='button' onClick='" + this.eventTriger(saveEvent) + "' " + saveDisabled + ">Save</button></td></tr>")
+            htmlList.push("</table>")
             Format.applyIndent(htmlList)
             this.addDivEleFrame(htmlList)
         }else{
@@ -60,8 +71,14 @@ class FormEditor extends DivEle{
         return htmlList
     }
 
+    // form editor should never redraw itself.
+    // if parent change my context, either parent should redraw itself or parent know to kick off my redraw
     processEvent(eventObj){
-        if(eventObj.type == FormEditor.inputChanged){
+        if(eventObj.type == FormEditor.Event.inputChanged){
+            let data = this.dataBag[FormEditor.Key.data]
+            if(!data){
+                return false
+            }
             let attr = eventObj.src
             if (!this.schema.data.hasOwnProperty(attr)){
                 return false
@@ -85,15 +102,13 @@ class FormEditor extends DivEle{
                     attrValue = DataType.htmlToValue(attrDef.type, attrValue)
                 }
             }            
-            if(!this.data[attr] || this.data[attr] != attrValue){
-                this.data[attr] = attrValue
-                if(this.dataBag.dataId){
-                    DataStore.GetStore().notify(this.dataBag.dataId)
-                }
+            if(!data.hasOwnProperty(attr) || data[attr] != attrValue){
+                data[attr] = attrValue
             }
-        } else if(eventObj.type == DataStore.dataChanged && eventObj.src == this.id){
-            this.bindData()
-            this.render()
+        } else if(eventObj.type == FormEditor.Event.saveData){
+            DataStore.GetStore().notify(this.id, this.id)
+        } else if(eventObj.type == DataStore.dataChanged && !this.parentId && eventObj.data[EventSrc.Key.src] != this.id){
+            // if I have no parent, then I must have a static div anchor. I can decide to re-render myself
             return true
         }
         return false
