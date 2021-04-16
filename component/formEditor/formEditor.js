@@ -107,8 +107,7 @@ class FormEditor extends DivEle{
             }
         } else if(eventObj.type == FormEditor.Event.saveData){
             DataStore.GetStore().notify(this.id, this.id)
-        } else if(eventObj.type == DataStore.dataChanged && !this.parentId && eventObj.data[EventSrc.Key.src] != this.id){
-            // if I have no parent, then I must have a static div anchor. I can decide to re-render myself
+        } else if(eventObj.type == DataStore.dataChanged && eventObj.data[EventSrc.Key.src] != this.id){
             return true
         }
         return false
