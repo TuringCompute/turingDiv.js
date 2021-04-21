@@ -18,7 +18,8 @@ class TabSwitch extends DivEle{
         if(!props.hasOwnProperty(TabSwitch.Key.tabList) || !Array.isArray(props[TabSwitch.Key.tabList] || props[TabSwitch.Key.tabList].length==0)){
             throw Error("property " +TabSwitch.Key.tabList + " need to be an array with data")
         }
-        this.tabList = props[TabSwitch.Key.tabList]
+        this.tabList = []
+        for(let tab of props[TabSwitch.Key.tabList])
         this.selectedTab = 0
     }
 
