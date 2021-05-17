@@ -4,7 +4,6 @@ import {DivEle} from "../../lib/divEle.js"
 import {EventSrc} from "../../lib/event.js"
 import {OrderedDict} from "../../lib/orderedDict.js"
 import {Format} from "../../lib/format.js"
-import { EditList } from "../tableList/tableList.js"
 
 
 class FormEditor extends DivEle{
@@ -38,9 +37,9 @@ class FormEditor extends DivEle{
         if(!this.tempalte){
             // no display template, so use the default attribute edit table
             let data = this.dataBag[FormEditor.Key.data]
-            for(let idx in this.schema.attrOrder){
-                let attr = this.schema.attrOrder[idx]
-                let attrDef = this.schema.data[attr]
+            for(let idx in this.schema.list){
+                let attr = this.schema.list[idx]
+                let attrDef = this.schema.getValue(attr)
                 let inputType = "text"
                 if(attrDef.type == DataType.bool){
                     inputType = "checkbox"

@@ -89,9 +89,10 @@ class TableList extends DivEle {
     }
 
     headerHtml(){
-        let headerStr = "<th>Idx</th>"
+        let styleStr = "style='background: blue;color: white;white-space: nowrap;'"
+        let headerStr = "<th " + styleStr + ">Idx</th>"
         for(let idx in this.displayOrder){
-            headerStr += "<th>" + this.displayOrder[idx][1] + "</th>"
+            headerStr += "<th " + styleStr + ">" + this.displayOrder[idx][1] + "</th>"
         }
         return headerStr
     }
@@ -198,7 +199,10 @@ class EditList extends TableList {
             this.dataBag[EditList.Key.checkbox].length = 0
             if(newList.length != this.dataBag[TableList.Key.records].length){
                 this.dataBag[TableList.Key.records].length = 0
-                this.dataBag[TableList.Key.records].push(...newList)            
+                this.dataBag[TableList.Key.records].push(...newList)
+                if(this.dataBag.hasOwnProperty(TableList.Key.selectedId)){
+                    delete this.dataBag[TableList.Key.selectedId]
+                }
                 DataStore.GetStore().notify(this.id)
             }
         }

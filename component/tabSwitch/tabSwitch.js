@@ -10,6 +10,8 @@ class TabSwitch extends DivEle{
     })
 
     static Key = Object.freeze({
+        "tabDisplay": "tabSwitchDisplay",
+        "tabKey": "tabSwitchTabKey",
         "tabList": "tabSwitchTabList"
     })
 
@@ -19,7 +21,16 @@ class TabSwitch extends DivEle{
             throw Error("property " +TabSwitch.Key.tabList + " need to be an array with data")
         }
         this.tabList = []
-        for(let tab of props[TabSwitch.Key.tabList])
+        for(let idx in props[TabSwitch.Key.tabList]){
+            let tab = props[TabSwitch.Key.tabList][idx]
+            if(!tab.hasOwnProperty(TabSwitch.Key.tabKey)){
+                throw Error("missing Key [" + TabSwitch.Key.tabKey + "] @ tab #" + idx)
+            }
+            if (!tab.hasOwnProperty(TabSwitch.Key.tabDisplay)){
+                throw Error("missing Key [" + TabSwitch.Key.tabDisplay + "] @ tab #" + idx)
+            }
+            this.tabList.push(tab)
+        }
         this.selectedTab = 0
     }
 
@@ -35,16 +46,19 @@ class TabSwitch extends DivEle{
     }
 
     selectedTabValue(){
-        return this.dataBag.tabData[this.dataBag.selectedIdx]
+        let tab = this.tabList[this.selectedTab]
+        return tab[TabSwitch.Key.tabKey]
     }
 
     selectedTabHtml(idx){
-        return "<td style='border-left: 1px solid rgba(204,31,48,1);border-top: 2px solid rgba(204,31,48,1);border-right: 2px solid rgba(204,31,48,1);cursor:default;'>" + this.tabList[idx] + "</td>"
+        let display = this.tabList[idx][TabSwitch.Key.tabDisplay]
+        return "<td style='border-left: 1px solid rgba(204,31,48,1);border-top: 2px solid rgba(204,31,48,1);border-right: 2px solid rgba(204,31,48,1);cursor:default;'>" + display + "</td>"
     }
 
     optTabHtml(idx){
+        let display = this.tabList[idx][TabSwitch.Key.tabDisplay]
         let selectEvent = EventSrc.new(TabSwitch.Event.clicked, idx, {})
-        return "<td style='border-top: 1px solid rgba(204,31,48,1);border-right: 1px solid rgba(204,31,48,1);cursor:hand;' onclick='" + this.eventTriger(selectEvent) +"'>" + this.tabList[idx] + "</td>"
+        return "<td style='border-top: 1px solid rgba(204,31,48,1);border-right: 1px solid rgba(204,31,48,1);cursor:hand;' onclick='" + this.eventTriger(selectEvent) +"'>" + display + "</td>"
     }
 
     outputTabHtml(){
