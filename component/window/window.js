@@ -6,6 +6,7 @@ import {EventSrc} from "../../lib/event.js"
 import {MouseState} from "../../lib/mouse.js"
 
 class WinEle extends DivEle{
+    
     constructor(props){
         super(props)
         let childrenData = OrderedDict.emptyDict()
@@ -15,33 +16,55 @@ class WinEle extends DivEle{
         if (!this.props.title){
             this.props.title = "&nbsp;"
         }
-        this.props.titleHeight = 20
+        this.props.titleHeight = 30
         this.children = new OrderedDict(childrenData)
+        this.closed = false
+        this.minDisplay = false
+        this.maxDisplay = true
     }
 
-    static Action = {
-        move: "winEleMove",
-        resizeLeft: "resizeLeft",
-        resizeRight: "resizeRight",
-        resizeBottom: "resizeBottom"
-    }
+    static Action = Object.freeze({
+        "btnClose": "winEleButtonClose",
+        "move": "winEleMove",
+        "resizeLeft": "resizeLeft",
+        "resizeRight": "resizeRight",
+        "resizeBottom": "resizeBottom"
+    })
 
     mouseEvent(action){
         let mseEventStr = " onMouseDown='" + this.eventTriger(EventSrc.new(MouseState.mouseDown, null, {"action": action})) + "' "
         return mseEventStr
     }
 
+    titleHtml(){
+        let htmlList = []
+        htmlList.push("<div style='position:absolute;color:#ffffff; background-color:#2a9df4;" + 
+        "left:0px;top:0px;height:" + this.props.titleHeight + "px;width:" + this.props.width + "px;'"+
+        " " + this.mouseEvent([WinEle.Action.move]) + ">")
+        htmlList.push(" <table style='width:100%; height:100%;'>")
+        htmlList.push("     <tr>")
+        htmlList.push("         <td width=100%>" + this.props.title + "</td>")
+        htmlList.push("         <td><button type='button' class='btn-close' onClick='" + this.eventTriger(EventSrc.new(WinEle.Action.btnClose, null, {})) + "'>X</button></td>")
+        htmlList.push("     </tr>")
+        htmlList.push(" </table>")
+        htmlList.push("</div>")
+        return htmlList
+    }
+
     outputHTML(){
         StyleSheet.validatePos(this.props)
         let htmlList = []
-        htmlList.push("<div style='position:absolute;color:#ffffff; background-color:#2a9df4;" + 
-                    "left:0px;top:0px;height:" + this.props.titleHeight + "px;width:" + this.props.width + "px;'"+
-                    " " + this.mouseEvent([WinEle.Action.move]) + ">" + this.props.title + "</div>")
+        if(this.closed){
+            return htmlList
+        }
+        let titleBar = this.titleHtml()
+        htmlList.push(...titleBar)
         this.addBoarder(htmlList)
         let winHeight = (this.props.height - 20)
         if(winHeight > 0){
             htmlList.push("<div class='crop' style='left:0px;top:" + this.props.titleHeight + "px;height=" + winHeight + "px;width:" + this.props.width + "px;'>")
-            for(let childId of this.children.attrOrder){
+            let childrenIdx = this.children.listIdx()
+            for(let childId of childrenIdx){
                 let cNode = this.children.data[childId].node
                 childHtml = cNode.outputHTML()
                 htmlList.push(...childHtml)
@@ -124,6 +147,9 @@ class WinEle extends DivEle{
                 }
                 return true
             }
+        } else if (eventObj.type == WinEle.Action.btnClose){
+            this.closed = true
+            return true
         }
         return false
     }
