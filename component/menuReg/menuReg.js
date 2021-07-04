@@ -14,6 +14,7 @@ class MenuReg extends DivEle{
             MenuReg.instance = this
             this.showMenuId = null
             this.posStyle = ""
+            this.menuMap = {}
             this.showMenuTopLeft = this.showMenuTopLeft.bind(this)
             window.showMenuTopLeft = this.showMenuTopLeft
         }
@@ -27,8 +28,12 @@ class MenuReg extends DivEle{
         return MenuReg.instance
     }
 
+    registerMenu(menu){
+        this.menuMap[menu.menuId] = menu
+    }
+
     showMenuTopLeft(top, left, menuId){
-        if(!menuId || !this.children.getValue(menuId)){
+        if(!menuId || !this.menuMap.hasOwnProperty(menuId)){
             throw Error("invalid menuId [" + menuId + "]")
         }
         let posStyle = "top: " + top + "px; left: " + left + "px;"
@@ -48,9 +53,9 @@ class MenuReg extends DivEle{
 
     outputHTML(){
         let htmlList = []
-        if(this.showMenuId){
-            let menuObj = this.children.getValue(this.showMenuId)
-            let menuHtml = menuObj.node.outputHTML()
+        if(this.showMenuId && this.menuMap.hasOwnProperty(this.showMenuId)){
+            let menuObj = this.menuMap[this.showMenuId]
+            let menuHtml = menuObj.outputHTML()
             Format.applyIndent(menuHtml)
             htmlList.push(...menuHtml)
         }
@@ -87,7 +92,7 @@ class MenuReg extends DivEle{
         if(eventObj.type == MenuReg.Events.show){
             mouse.registerTarget(this)
             return true
-        } else if(eventObj.type == MouseState.mouseUp){
+        } else if(eventObj.type == MenuReg.Events.hide || eventObj.type == MouseState.mouseUp){
             let event = eventObj[EventSrc.Key.rawEvent]
             if (this.clickIn(event)){
                 return false
