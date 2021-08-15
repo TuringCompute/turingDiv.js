@@ -26,6 +26,7 @@ class WinEle extends DivEle{
 
     constructor(props){
         super(props)
+        this.init_property()
         let childrenData = OrderedDict.emptyDict()
         if (props.children){
             childrenData = props.children
@@ -50,101 +51,112 @@ class WinEle extends DivEle{
         "moved": "winEleMoved"
     })
 
+    init_property(){
+        this.leftBoarder = ""
+        this.leftBoarderCur = ""
+        this.leftBottomDot = ""
+        this.leftBottomCur = ""
+        this.rightBoarder = ""
+        this.rightBoarderCur = ""
+        this.rightBottomDot = ""
+        this.rightBottomCur = ""
+        this.bottomBoarder = ""
+        this.bottomCur = ""
+        if(this.enableResize || this.enableResizeLeft){
+            this.leftBoarder = this.mouseEvent([WinEle.Action.resizeLeft])
+            this.leftBoarderCur = "cursor: w-resize;"
+        }
+        if(this.enableResize || this.enableResizeRight){
+            this.rightBoarder = this.mouseEvent([WinEle.Action.resizeRight])
+            this.rightBoarderCur = "cursor: e-resize;"
+        }            
+        if(this.enableResize || this.enableResizeBottom){
+            this.bottomBoarder = this.mouseEvent([WinEle.Action.resizeBottom])
+            this.bottomCur = "cursor: s-resize;"
+            if(this.enableResize || this.enableResizeRight){
+                this.rightBottomDot = this.mouseEvent([WinEle.Action.resizeRight, WinEle.Action.resizeBottom])
+                this.rightBottomCur = "cursor: se-resize;"
+            }
+            if(this.enableResize|| this.enableResizeLeft){
+                this.leftBottomDot = this.mouseEvent([WinEle.Action.resizeLeft, WinEle.Action.resizeBottom])
+                this.leftBottomCur = "cursor: sw-resize;"
+            }
+        }
+    }
+
     mouseEvent(action){
         let mseEventStr = " onMouseDown='" + this.eventTriger(EventSrc.new(MouseState.mouseDown, null, {"action": action})) + "' "
         return mseEventStr
     }
 
+    calcTitleHeight(){
+        if(this.enableTitle){
+            return this.titleHeight
+        }
+        return 0
+    }
+
     innerWidth(){
-        return this.width=="100%"? this.width: this.width + "px"
+        return this.width=="100%"? this.width: (this.width - 5) + "px"
     }
 
     innerHeight(){
-        return this.height=="100%"? this.height: (this.height - this.titleHeight) + "px"
+        let titleHeight = this.calcTitleHeight()
+        return this.height=="100%"? this.height: (this.height - titleHeight - 5) + "px"
     }
 
     titleHtml(){
-        let htmlList = []
-        let moveEventStr = this.enableMove? this.mouseEvent([WinEle.Action.move]): ""
-        htmlList.push("<div style='position:relative;color:#ffffff; background-color:#2a9df4;" + 
-        "left:0px;top:0px;height:" + this.titleHeight + "px;width:" + this.innerWidth() + "px;'"+
-        " " + moveEventStr + ">")
-        htmlList.push(" <table style='width:100%; height:100%;'>")
-        htmlList.push("     <tr>")
-        htmlList.push("         <td width=100%>" + this.title + "</td>")
-        if (this.enableCloseButton){
-            htmlList.push("         <td><button type='button' class='btn-close' onClick='" + this.eventTriger(EventSrc.new(WinEle.Action.btnClose, null, {})) + "'>X</button></td>")
+        if (!this.enableTitle){
+            return []
         }
-        htmlList.push("     </tr>")
-        htmlList.push(" </table>")
-        htmlList.push("</div>")
-        return htmlList
+        let moveEventStr = this.enableMove? this.mouseEvent([WinEle.Action.move]): ""
+        let titleHtml = []
+        titleHtml.push("    <tr style='height:30px;'>")
+        titleHtml.push("        <td style='color:#ffffff; background-color:#2a9df4;width:" + this.innerWidth() + 
+                        "' colspan=3 " + moveEventStr + ">")
+        titleHtml.push("            <table style='width:100%; height:100%;'>")
+        titleHtml.push("                <tr>")
+        titleHtml.push("                    <td width=100%>" + this.title + "</td>")
+        if (this.enableCloseButton){
+            titleHtml.push("                    <td><button type='button' class='btn-close' onClick='" + this.eventTriger(EventSrc.new(WinEle.Action.btnClose, null, {})) + "'>X</button></td>")
+        }
+        titleHtml.push("                </tr>")
+        titleHtml.push("            </table>")
+        titleHtml.push("        </td>")
+        titleHtml.push("    </tr>")
+        return titleHtml
     }
 
     outputHTML(){
         let htmlList = []
         if(this.closed){
-            return htmlList
+            return []
         }
-        if (this.enableTitle){
-            let titleBar = this.titleHtml()
-            htmlList.push(...titleBar)
-        }        
-        this.addBoarder(htmlList)
-        htmlList.push("<div class='crop' style='left:0px;top:" + this.titleHeight + "px;height=" + this.innerHeight() + ";width:" + this.innerWidth() + ";'>")
+        let titleHtml = this.titleHtml()
+        htmlList.push("<table style='height:100%;border-spacing:0px;padding:0px;border-left: 2px solid #2a9df4;border-right: 2px solid #2a9df4;border-bottom:2px solid #2a9df4;'>")
+        htmlList.push(...titleHtml)
+        htmlList.push("    <tr>")
+        htmlList.push("        <td " + this.leftBoarder + " style='width:2px;" + this.leftBoarderCur + "'></td>")
+        htmlList.push("        <td style='width:" + this.innerWidth() + ";height:100%;vertical-align:top;'>")
         let childrenIdx = this.children.listIdx()
         for(let childId of childrenIdx){
             let cNode = this.children.data[childId].node
             let childHtml = cNode.outputHTML()
+            Format.applyIndent(childHtml, "            ")
             htmlList.push(...childHtml)
         }
-        htmlList.push("</div>")
+        htmlList.push("        </td>")
+        htmlList.push("        <td style='width:2px;" + this.rightBoarderCur + "' " + this.rightBoarder + "></td>")
+        htmlList.push("    </tr>")
+        htmlList.push("    <tr>")
+        htmlList.push("        <td " + this.leftBottomDot + " style='width:2px;" + this.leftBottomCur + "'></td>")
+        htmlList.push("        <td " + this.bottomBoarder + " style='width:2px;" + this.bottomCur + "'></td>")
+        htmlList.push("        <td " + this.rightBottomDot + " style='width:2px;" + this.rightBottomCur + "'></td>")
+        htmlList.push("    </tr>")
+        htmlList.push("</table>")
         Format.applyIndent(htmlList)
         this.addDivEleFrame(htmlList)
         return htmlList
-    }
-
-    addBoarder(htmlList){
-        let leftBoarder = ""
-        let leftBoarderCur = ""
-        let leftBottomDot = ""
-        let leftBottomCur = ""
-        let rightBoarder = ""
-        let rightBoarderCur = ""
-        let rightBottomDot = ""
-        let rightBottomCur = ""
-        let bottomBoarder = ""
-        let bottomCur = ""
-        
-        if(this.enableResize || this.enableResizeLeft){
-            leftBoarder = this.mouseEvent([WinEle.Action.resizeLeft])
-            leftBoarderCur = "cursor: w-resize;"
-        }
-        if(this.enableResize || this.enableResizeRight){
-            rightBoarder = this.mouseEvent([WinEle.Action.resizeRight])
-            rightBoarderCur = "cursor: e-resize;"
-        }            
-        if(this.enableResize || this.enableResizeBottom){
-            bottomBoarder = this.mouseEvent([WinEle.Action.resizeBottom])
-            bottomCur = "cursor: s-resize;"
-            if(this.enableResize || this.enableResizeRight){
-                rightBottomDot = this.mouseEvent([WinEle.Action.resizeRight, WinEle.Action.resizeBottom])
-                rightBottomCur = "cursor: se-resize;"
-            }
-            if(this.enableResize|| this.enableResizeLeft){
-                leftBottomDot = this.mouseEvent([WinEle.Action.resizeLeft, WinEle.Action.resizeBottom])
-                leftBottomCur = "cursor: sw-resize;"
-            }
-        }
-            
-        let brHtml = [
-            "<div " + leftBoarder + " style='position:absolute;top:0;left:0;bottom:0;border-left: 2px solid #2a9df4;" + leftBoarderCur + "'></div>",
-            "<div " + leftBottomDot + " style='position:absolute;width:6px;height:6px;border-radius: 2px;border: 1px solid #808080; background: #FFF;opacity: 0; bottom: -3px;left: -3px;" + leftBottomCur + "'></div>",
-            "<div " + rightBoarder + " style='position:absolute;top:0;right:0;bottom:0;border-right: 2px solid #2a9df4;" + rightBoarderCur + "'></div>",
-            "<div " + rightBottomDot + " style='position:absolute;width:6px;height:6px;border-radius: 2px;border: 1px solid #808080; background: #FFF;opacity: 0; bottom: -3px;right: -3px;" + rightBottomCur + "'></div>",
-            "<div " + bottomBoarder + " style='position:absolute;left:0;right:0;bottom:0;border-bottom: 2px solid #2a9df4;" + bottomCur + "'></div>"
-        ]        
-        htmlList.push(...brHtml)
     }
 
     addDivEleFrame(htmlList){
@@ -155,8 +167,8 @@ class WinEle extends DivEle{
         }
         let frameHeight = this.height == "100%"? this.height: this.height + "px"
         let frameWidth = this.width == "100%"? this.width: this.width + "px"
-        htmlList.splice(0,0, "<div id='" + this.id + "' style='position:relative;left:" + this.left + "px;top:" + this.top + "px;" + 
-                            "width:" + frameWidth + ";height:" + frameHeight+ ";" + zIdx + "'>")
+        htmlList.splice(0,0, "<div id='" + this.id + "' style='position:relative;left:" + this.left + "px;top:" + this.top + "px;" +
+                            "width:" + frameWidth + ";height:" + frameHeight + ";" + zIdx + "'>")
         htmlList.push("</div>")
     }
 
@@ -178,13 +190,15 @@ class WinEle extends DivEle{
                 "y": rawEvent.y
             }
             mouse.registerTarget(this)
+            EventSrc.stop(eventObj)
         } else if(eventObj.type == MouseState.mouseUp){
             if(this.mouseData){
                 delete this.mouseData
             }
             mouse.deregister()
+            EventSrc.stop(eventObj)
         } else if(eventObj.type == MouseState.mouseMoved){
-            if(this.mouseData){
+            if(this.mouseData && this.mouseData.action){
                 if(this.mouseData.action[0] == WinEle.Action.move){
                     this.left = this.mouseData.left + (rawEvent.x - this.mouseData.x)
                     this.top = this.mouseData.top + (rawEvent.y - this.mouseData.y)
