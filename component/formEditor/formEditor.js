@@ -22,7 +22,7 @@ class FormEditor extends DivEle{
         if(!props.schema){
             throw Error("missing schema in props to build")
         }
-        this.dataBag = DataStore.GetStore().newData(this.id, DataStore.subscriber(this.id, this.handleEvent))
+        this.dataBag = DataStore.GetStore().getData(this.id, DataStore.subscriber(this.id, this.handleEvent))
         this.schema = new OrderedDict(this.props.schema)
         this.template = this.props.template
     }

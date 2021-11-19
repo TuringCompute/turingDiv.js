@@ -16,7 +16,7 @@ class TableList extends DivEle {
         this.fieldSchema = props.fieldSchema
         this.displayOrder = props.displayOrder
         this.validateSchema()
-        this.dataBag = DataStore.GetStore().newData(this.id, DataStore.subscriber(this.id, this.handleEvent))
+        this.dataBag = DataStore.GetStore().getData(this.id, DataStore.subscriber(this.id, this.handleEvent))
         this.dataBag[TableList.Key.records] = []
     }
 
