@@ -21,6 +21,8 @@ class MenuReg extends DivEle{
         return MenuReg.instance
     }
 
+    // Please make sure create MenuReg Object at root level so it can successfully initiate
+    // usually initiallized in main.js
     static GetMenu(){
         if(!MenuReg.instance){
             throw Error("please instantiate MenuReg with a div-id")
