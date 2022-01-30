@@ -31,6 +31,9 @@ class MenuReg extends DivEle{
     }
 
     registerMenu(menu){
+        if(!menu.menuId){
+            throw Error("invalid object, missing attribute menuId")
+        }
         this.menuMap[menu.menuId] = menu
     }
 
@@ -107,4 +110,22 @@ class MenuReg extends DivEle{
     }
 }
 
-export {MenuReg}
+class MenuTemplate extends DivEle{
+    getMenuId(){
+        throw Error("please implement getMenuId function")
+    }
+
+    constructor(props){
+        super(props)
+        if(!this.parent){
+            throw Error("Menu should have a parent.")
+        }
+        this.menuId = this.getMenuId()
+    }
+
+    idInput(attribute, value){
+        return this.id + "_" + attribute + "_" + value
+    }
+}
+
+export {MenuReg, MenuTemplate}
