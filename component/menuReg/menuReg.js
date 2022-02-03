@@ -20,7 +20,8 @@ class MenuReg extends DivEle{
             }
             let menuDiv = document.getElementById(props[DivEle.Key.divId])
             if(!props[DivEle.Key.divId] || !menuDiv){
-                this.initDiv()
+                MenuReg.initDiv()
+                props[DivEle.Key.divId] = MenuReg.Key.MenuReg
             }
             super(props)
             this.showMenuId = null
@@ -33,14 +34,13 @@ class MenuReg extends DivEle{
         return MenuReg.instance
     }
 
-    initDiv(){
+    static initDiv(){
         let menuDiv = document.getElementById(MenuReg.Key.MenuReg)
         if(!menuDiv){
             menuDiv = document.createElement("div")
             menuDiv.id = MenuReg.Key.MenuReg
             document.body.appendChild(menuDiv)
         }
-        props[DivEle.Key.divId] = MenuReg.Key.MenuReg
     }
 
     // Please make sure create MenuReg Object at root level so it can successfully initiate
