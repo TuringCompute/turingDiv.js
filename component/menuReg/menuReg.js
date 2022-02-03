@@ -69,7 +69,13 @@ class MenuReg extends DivEle{
         this.handleEvent(EventSrc.new(MenuReg.Events.show, null, null))
     }
 
-    hideMenu(){
+    hide(){
+        if(this.showMenuId){
+            this.handleEvent(EventSrc.new(MenuReg.Events.hide, null, null))
+        }
+    }
+
+    _hideMenu(){
         if(this.showMenuId){
             this.showMenuId = null
             this.posStyle = ""
@@ -122,7 +128,7 @@ class MenuReg extends DivEle{
             if (this.clickIn(event)){
                 return false
             }
-            this.hideMenu()
+            this._hideMenu()
             mouse.deregister()
             return true
         }
@@ -141,12 +147,19 @@ class MenuTemplate extends DivEle{
             throw Error("Menu should have a parent.")
         }
         this.menuId = this.getMenuId()
-        this.menu = new MenuReg()
-        this.menu.registerMenu(this)
+        let menu = MenuReg.GetMenu()
+        menu.registerMenu(this)
     }
 
     idInput(attribute, value){
         return this.id + "_" + attribute + "_" + value
+    }
+
+    processEvent(eventObj){
+        if(eventObj.type == DivEle.Events.resized){
+            let menu = MenuReg.GetMenu()
+            menu.hide()            
+        }
     }
 }
 
