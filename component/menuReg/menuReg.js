@@ -4,30 +4,50 @@ import {EventSrc} from "../../lib/event.js"
 import {Format} from "../../lib/format.js"
 
 class MenuReg extends DivEle{
-    static Events = {
+    static Key = Object.freeze({
+        "menuReg": "DivEleMenuReg"
+    })
+
+    static Events = Object.freeze({
         "show": "MenuRegShow",
         "hide": "MenuRegHide"
-    }
+    })
+
     constructor(props){
         if (!MenuReg.instance){
+            if(!props){
+                props = {}
+            }
+            let menuDiv = document.getElementById(props[DivEle.Key.divId])
+            if(!props[DivEle.Key.divId] || !menuDiv){
+                this.initDiv()
+            }
             super(props)
-            MenuReg.instance = this
             this.showMenuId = null
             this.posStyle = ""
             this.menuMap = {}
             this.showMenuTopLeft = this.showMenuTopLeft.bind(this)
             window.showMenuTopLeft = this.showMenuTopLeft
+            MenuReg.instance = this
         }
         return MenuReg.instance
+    }
+
+    initDiv(){
+        let menuDiv = document.getElementById(MenuReg.Key.MenuReg)
+        if(!menuDiv){
+            menuDiv = document.createElement("div")
+            menuDiv.id = MenuReg.Key.MenuReg
+            document.body.appendChild(menuDiv)
+        }
+        props[DivEle.Key.divId] = MenuReg.Key.MenuReg
     }
 
     // Please make sure create MenuReg Object at root level so it can successfully initiate
     // usually initiallized in main.js
     static GetMenu(){
-        if(!MenuReg.instance){
-            throw Error("please instantiate MenuReg with a div-id")
-        }
-        return MenuReg.instance
+        let menu = new MenuReg()
+        return menu
     }
 
     registerMenu(menu){
@@ -121,6 +141,8 @@ class MenuTemplate extends DivEle{
             throw Error("Menu should have a parent.")
         }
         this.menuId = this.getMenuId()
+        this.menu = new MenuReg()
+        this.menu.registerMenu(this)
     }
 
     idInput(attribute, value){
