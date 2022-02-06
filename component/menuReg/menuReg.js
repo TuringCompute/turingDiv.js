@@ -57,11 +57,11 @@ class MenuReg extends DivEle{
         this.menuMap[menu.menuId] = menu
     }
 
-    showMenuTopLeft(top, left, menuId){
+    showMenuTopLeft(x, y, menuId){
         if(!menuId || !this.menuMap.hasOwnProperty(menuId)){
             throw Error("invalid menuId [" + menuId + "]")
         }
-        let posStyle = "top: " + top + "px; left: " + left + "px;"
+        let posStyle = "top: " + y + "px; left: " + x + "px;"
         if(!this.showMenuId || this.showMenuId != menuId || this.posStyle != posStyle){
             this.showMenuId = menuId
             this.posStyle = posStyle
