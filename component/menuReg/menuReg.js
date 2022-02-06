@@ -158,8 +158,11 @@ class MenuTemplate extends DivEle{
     processEvent(eventObj){
         if(eventObj.type == DivEle.Events.resized){
             let menu = MenuReg.GetMenu()
-            menu.hide()            
+            if(menu.showMenuId == this.getMenuId()){
+                menu.hide()
+            }
         }
+        return false
     }
 }
 
